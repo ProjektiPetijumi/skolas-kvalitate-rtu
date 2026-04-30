@@ -116,7 +116,7 @@ st.markdown(
 
 # Progresa josla
 total_steps = 5
-progress = st.session_state.step / total_steps
+progress = min(st.session_state.step / total_steps, 1.0)
 st.progress(progress)
 st.caption(f"Solis {st.session_state.step + 1} no {total_steps + 1}")
 st.markdown("---")
