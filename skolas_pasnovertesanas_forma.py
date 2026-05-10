@@ -1,4 +1,3 @@
-
 """
 Vispārējās vidējās izglītības iestāžu kvalitātes sistēmas
 PAŠNOVĒRTĒŠANAS FORMA
@@ -916,3 +915,4 @@ st.markdown(
     "Geide I. (2026). Kvalitātes novērtējums un starpdisciplinaritāte "
     "vispārējās vidējās izglītības iestādēs. RTU IEVF. "
     "Darba vadītāja: prof. Inga Lapiņa.*"
+)
