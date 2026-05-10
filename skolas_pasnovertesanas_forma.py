@@ -1,3 +1,4 @@
+
 """
 Vispārējās vidējās izglītības iestāžu kvalitātes sistēmas
 PAŠNOVĒRTĒŠANAS FORMA
@@ -69,6 +70,13 @@ st.markdown("""
         font-family: "Times New Roman", Times, serif !important;
         font-size: 12pt !important;
     }
+    .dimensija-virsraksts {
+        background-color: #f0f0f0;
+        padding: 10px 15px;
+        border-left: 4px solid #2a2a2a;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -132,6 +140,11 @@ if st.session_state.step == 0:
     kvalitātes sistēmas stāvokli un saņemt individualizētu atskaiti ar
     konkrētiem uzlabojumu priekšlikumiem.
 
+    Rīks balstīts uz divlīmeņu modeli, kurā **starpdisciplinaritāte tiek
+    skatīta kā izglītības kvalitātes elements** (mācību satura un metodikas
+    līmenī), bet tās efektīva īstenošana prasa **integrētas sistēmas atbalstu**
+    vadības procesu līmenī.
+
     **Aizpildīšana aizņem aptuveni 15–20 minūtes.**
 
     Pašnovērtēšana ietver piecas sadaļas:
@@ -147,7 +160,7 @@ if st.session_state.step == 0:
         Pašnovērtējums septiņās standarta sadaļās.
 
         **3. Starpdisciplinaritātes integrācija**
-        K1–K5 kritēriju pašvērtējums.
+        K1–K5 kritēriju pašvērtējums divās dimensijās.
         """)
     with col2:
         st.markdown("""
@@ -166,7 +179,7 @@ if st.session_state.step == 0:
     st.info(
         "Pašnovērtēšana ir anonīma. Ievadītie dati netiek saglabāti "
         "ārpus jūsu sesijas — pēc atskaites saņemšanas un pārlūka "
-        "aizvēršanas tie tiek dzēsti. Atskaiti var saglabāt PDF formātā."
+        "aizvēršanas tie tiek dzēsti. Atskaiti var saglabāt teksta formātā."
     )
 
     st.markdown("##### Ieteicams sagatavot")
@@ -188,7 +201,7 @@ elif st.session_state.step == 1:
     st.subheader("1. Iestādes raksturojums")
     st.markdown(
         "Pamata informācija nepieciešama atskaites kontekstualizēšanai. "
-        "Iestādes nosaukums atskaitē tiks parādīts, bet dati netiks "
+        "Iestādes nosaukums atskaitē tiks parādīts, bet dati netiek "
         "saglabāti ārējās datubāzēs."
     )
 
@@ -331,16 +344,33 @@ elif st.session_state.step == 2:
             st.rerun()
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 3. SOLIS — STARPDISCIPLINARITĀTES INTEGRĀCIJA (K1–K5)
+# 3. SOLIS — STARPDISCIPLINARITĀTES INTEGRĀCIJA (K1–K5) DIVĀS DIMENSIJĀS
 # ═══════════════════════════════════════════════════════════════════════════════
 elif st.session_state.step == 3:
     st.subheader("3. Starpdisciplinaritātes integrācijas pašvērtējums")
     st.markdown(
-        "Novērtējiet, cik sistemātiski iestādē tiek integrēta "
-        "starpdisciplinaritāte piecos kvalitātes kritērijos (K1–K5)."
+        "Pašvērtējuma modelis veidots kā divu savstarpēji papildinošu "
+        "dimensiju ietvars. **Mācību kvalitātes dimensija (K1–K3)** ietver "
+        "kritērijus, kuros tieši darbojas starpdisciplinaritāte kā izglītības "
+        "kvalitātes elements caur citu jomu metožu integrāciju mācību saturā "
+        "un procesā. **Integrētās sistēmas dimensija (K4–K5)** ietver "
+        "kritērijus, kuros darbojas vadības procesu mijiedarbība, kas rada "
+        "apstākļus pirmās dimensijas efektīvai darbībai."
     )
 
-    kriteriji = {
+    sd_dati = {}
+
+    # ── MĀCĪBU KVALITĀTES DIMENSIJA (K1–K3) ──────────────────────────────────
+    st.markdown(
+        '<div class="dimensija-virsraksts">'
+        '<b>I. Mācību kvalitātes dimensija</b><br>'
+        '<i>Starpdisciplinaritāte kā izglītības kvalitātes elements '
+        '(66% no kopējās ietekmes uz mācību kvalitāti)</i>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    macibu_kriteriji = {
         "k1_rezultati": (
             "K1. Izglītojamo rezultāti un kompetences",
             "Vai izglītojamo sasniegumos tiek mērītas ne tikai disciplinārās, "
@@ -349,28 +379,56 @@ elif st.session_state.step == 3:
         ),
         "k2_process": (
             "K2. Mācību procesa kvalitāte",
-            "Vai notiek regulāra starpdisciplināra mācīšana (team teaching, "
-            "integrētas tēmas, kopīgi projekti)?"
+            "Vai mācību procesa īstenošanā regulāri notiek starpdisciplināra "
+            "sadarbība starp mācību priekšmetiem (kopīga plānošana, integrētas "
+            "tēmas, starppriekšmetu projekti)?"
         ),
         "k3_saturs": (
             "K3. Mācību satura kvalitāte",
             "Cik liels procents mācību laika tiek veltīts starpdisciplināriem "
             "projektiem (mērķis: vismaz 15%)?"
         ),
+    }
+
+    for kods, (nosaukums, apraksts) in macibu_kriteriji.items():
+        st.markdown(f"**{nosaukums}**")
+        st.caption(apraksts)
+        sd_dati[kods] = st.slider(
+            nosaukums,
+            0, 100,
+            st.session_state.data.get(kods, 50),
+            5, format="%d%%",
+            key=f"sd_{kods}",
+            label_visibility="collapsed"
+        )
+        st.markdown("")
+
+    # ── INTEGRĒTĀS SISTĒMAS DIMENSIJA (K4–K5) ────────────────────────────────
+    st.markdown(
+        '<div class="dimensija-virsraksts">'
+        '<b>II. Integrētās sistēmas dimensija</b><br>'
+        '<i>Vadības procesu mijiedarbība, kas rada apstākļus '
+        'starpdisciplinaritātes īstenošanai (34% no kopējās ietekmes)</i>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    sistemas_kriteriji = {
         "k4_vide": (
             "K4. Vide un resursi",
             "Vai pastāv personāla sadarbības kultūra un nepieciešamie resursi "
-            "(laiks, materiāli, IT) starpdisciplinārai darbībai?"
+            "(laiks, materiāli, IT) starpdisciplinārai darbībai? "
+            "(mērķis: ≥30% personāla regulāri sadarbojas starpdisciplinaritātes "
+            "uzdevumos)"
         ),
         "k5_vadiba": (
-            "K5. Vadība un kvalitātes vadības sistēma",
+            "K5. Vadība un kvalitātes sistēma",
             "Vai starpdisciplinaritātes aktivitātes tiek sistēmiski plānotas, "
-            "monitorētas un novērtētas vadības līmenī?"
+            "monitorētas un novērtētas vadības līmenī (PDCA cikla ietvaros)?"
         ),
     }
 
-    sd_dati = {}
-    for kods, (nosaukums, apraksts) in kriteriji.items():
+    for kods, (nosaukums, apraksts) in sistemas_kriteriji.items():
         st.markdown(f"**{nosaukums}**")
         st.caption(apraksts)
         sd_dati[kods] = st.slider(
@@ -407,7 +465,7 @@ elif st.session_state.step == 4:
     )
 
     riski_saraksts = {
-        "r1": "Vadības atbalsts starpdisciplinaritātei nav stratēģiskā prioritāte",
+        "r1": "Vadības atbalsts starpdisciplinaritātei nav stratēģiska prioritāte",
         "r2": "Personālam trūkst kompetences procesu saskaņošanā",
         "r3": "Metodiskās komisijas strādā izolēti, bez starpfunkcionālas sadarbības",
         "r4": "Personālam trūkst zināšanu par citu mācību priekšmetu saturu",
@@ -429,11 +487,15 @@ elif st.session_state.step == 4:
         )
 
     # Procesu integrācijas pašvērtējums
-    st.markdown("##### Procesu integrācijas pašvērtējums")
+    st.markdown("##### Organizatorisko sistēmu integrācijas pašvērtējums")
+    st.caption(
+        "Šis rādītājs raksturo, cik labi savstarpēji integrēti ir iestādes "
+        "vadības un atbalsta procesi (mērķis: ≥75%)."
+    )
     procesu_integracija = st.slider(
         "Cik labi savstarpēji integrēti ir iestādes galvenie procesi "
         "(personāla vadība, kvalitātes sistēma, mācību process, "
-        "resursu pārvaldība)?",
+        "resursu pārvaldība, IT sistēmas)?",
         0, 100,
         st.session_state.data.get("procesu_integracija", 50),
         5, format="%d%%"
@@ -545,17 +607,45 @@ elif st.session_state.step == 6:
 
     iso_videja = sum([d['k4'], d['k5'], d['k6'], d['k7'], d['k8'],
                        d['k9'], d['k10']]) / 7
-    sd_videja = sum([d['k1_rezultati'], d['k2_process'], d['k3_saturs'],
-                      d['k4_vide'], d['k5_vadiba']]) / 5
+
+    # Dimensiju vidējie rādītāji
+    macibu_dimensija = (d['k1_rezultati'] + d['k2_process'] +
+                        d['k3_saturs']) / 3
+    sistemas_dimensija = (d['k4_vide'] + d['k5_vadiba']) / 2
+    sd_videja = (d['k1_rezultati'] + d['k2_process'] + d['k3_saturs'] +
+                  d['k4_vide'] + d['k5_vadiba']) / 5
+
     poc_kopa = d['poc_prev'] + d['poc_nov']
     ponc_kopa = d['ponc_iek'] + d['ponc_ar']
     kvalitates_izmaksas = poc_kopa + ponc_kopa
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("ISO 21001:2025 atbilstība", f"{iso_videja:.1f}%")
-    col2.metric("Starpdisciplinaritāte", f"{sd_videja:.1f}%")
+    col2.metric("Starpdisciplinaritāte (vidēji)", f"{sd_videja:.1f}%")
     col3.metric("Procesu integrācija", f"{d['procesu_integracija']}%")
     col4.metric("Kvalitātes izmaksas", f"{kvalitates_izmaksas:.1f}%")
+
+    # ── DIMENSIJU SADALĪJUMS ──
+    st.markdown("### Starpdisciplinaritātes dimensijas")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(
+            "Mācību kvalitātes dimensija (K1–K3)",
+            f"{macibu_dimensija:.1f}%"
+        )
+        st.caption(
+            "Starpdisciplinaritāte kā izglītības kvalitātes elements "
+            "(66% no kopējās ietekmes)"
+        )
+    with col2:
+        st.metric(
+            "Integrētās sistēmas dimensija (K4–K5)",
+            f"{sistemas_dimensija:.1f}%"
+        )
+        st.caption(
+            "Vadības procesu mijiedarbība, kas rada apstākļus "
+            "(34% no kopējās ietekmes)"
+        )
 
     # ── ISO RADARA DIAGRAMMA ──
     st.markdown("### ISO 21001:2025 atbilstības profils")
@@ -643,7 +733,7 @@ elif st.session_state.step == 6:
     # ── PRIORITĀRO RISKU SARAKSTS ──
     st.markdown("### Prioritārie riski")
     risku_apraksti = {
-        "r1": "Vadības atbalsts nav stratēģiskā prioritāte",
+        "r1": "Vadības atbalsts nav stratēģiska prioritāte",
         "r2": "Procesu saskaņošanas kompetences trūkums",
         "r3": "Starpfunkcionālo grupu izolētība",
         "r4": "Personāla zināšanas par citu priekšmetu",
@@ -678,12 +768,12 @@ elif st.session_state.step == 6:
             "3 mēneši, atmaksāšanās: 6 mēneši."
         ))
 
-    if sd_videja < 60:
+    if sistemas_dimensija < 60:
         priekslikumi.append((
             "Starpdisciplinaritātes koordinatoru iecelšana",
-            "Katrā metodiskajā komisijā nepieciešams formalizēts "
-            "koordinators ar stundu slodzi. Termiņš: 1 mēnesis, "
-            "izmaksas: ~5 000 EUR/gadā."
+            "Integrētās sistēmas dimensijas (K4–K5) stiprināšanai katrā "
+            "metodiskajā komisijā nepieciešams formalizēts koordinators ar "
+            "stundu slodzi. Termiņš: 1 mēnesis, izmaksas: ~5 000 EUR/gadā."
         ))
 
     if d['procesu_integracija'] < 65:
@@ -698,8 +788,8 @@ elif st.session_state.step == 6:
         priekslikumi.append((
             "Preventīvās kvalitātes budžeta sadaļa",
             "Atsevišķa budžeta pozīcija preventīvai kvalitātei "
-            "(3% no kopējā budžeta). Sagaidāmais PoNC samazinājums: "
-            "līdz ~50 000 EUR/gadā."
+            "(ap 3% no kopējā budžeta). Saskaņā ar Scenāriju B sagaidāmais "
+            "ietaupījums: līdz ~90 000 EUR/gadā vidēja lieluma iestādei."
         ))
 
     if d['k3_saturs'] < 50:
@@ -709,11 +799,12 @@ elif st.session_state.step == 6:
             "laika starpdisciplināriem projektiem. Termiņš: 2 mēneši."
         ))
 
-    if d['poc_prev'] < 5:
+    if macibu_dimensija < 60:
         priekslikumi.append((
             "Personāla profesionālā pilnveide",
-            "Sistemātiskas apmācības procesu vadībā un "
-            "starpdisciplinaritātes koordinācijā. ROI ~7.2:1."
+            "Mācību kvalitātes dimensijas (K1–K3) stiprināšanai "
+            "sistemātiskas apmācības procesu vadībā un "
+            "starpdisciplinaritātes koordinācijā. Indikatīvais ROI ~7.2:1."
         ))
 
     if not priekslikumi:
@@ -744,12 +835,12 @@ Atskaite ģenerēta: {datetime.now().strftime('%d.%m.%Y %H:%M')}
 ────────────────────────────────────────────────────────
 KOPĒJIE RĀDĪTĀJI
 ────────────────────────────────────────────────────────
-ISO 21001:2025 atbilstība:        {iso_videja:.1f}%
-Starpdisciplinaritātes integrācija: {sd_videja:.1f}%
-Procesu integrācija:               {d['procesu_integracija']}%
-Kvalitātes izmaksas (% budžeta):   {kvalitates_izmaksas:.1f}%
-  - Atbilstības (PoC):             {poc_kopa:.1f}%
-  - Neatbilstības (PoNC):          {ponc_kopa:.1f}%
+ISO 21001:2025 atbilstība:           {iso_videja:.1f}%
+Starpdisciplinaritātes integrācija:  {sd_videja:.1f}%
+Procesu integrācija:                 {d['procesu_integracija']}%
+Kvalitātes izmaksas (% budžeta):     {kvalitates_izmaksas:.1f}%
+  - Atbilstības (PoC):               {poc_kopa:.1f}%
+  - Neatbilstības (PoNC):            {ponc_kopa:.1f}%
 
 ────────────────────────────────────────────────────────
 ISO 21001:2025 SADAĻAS
@@ -765,11 +856,21 @@ ISO 21001:2025 SADAĻAS
 ────────────────────────────────────────────────────────
 STARPDISCIPLINARITĀTES KRITĒRIJI
 ────────────────────────────────────────────────────────
-K1. Izglītojamo rezultāti:        {d['k1_rezultati']}%
-K2. Mācību procesa kvalitāte:     {d['k2_process']}%
-K3. Mācību satura kvalitāte:      {d['k3_saturs']}%
-K4. Vide un resursi:              {d['k4_vide']}%
-K5. Vadība:                       {d['k5_vadiba']}%
+
+I. MĀCĪBU KVALITĀTES DIMENSIJA (66% no ietekmes)
+   Starpdisciplinaritāte kā izglītības kvalitātes elements
+   Vidējais: {macibu_dimensija:.1f}%
+
+   K1. Izglītojamo rezultāti:        {d['k1_rezultati']}%
+   K2. Mācību procesa kvalitāte:     {d['k2_process']}%
+   K3. Mācību satura kvalitāte:      {d['k3_saturs']}%
+
+II. INTEGRĒTĀS SISTĒMAS DIMENSIJA (34% no ietekmes)
+    Vadības procesu mijiedarbība
+    Vidējais: {sistemas_dimensija:.1f}%
+
+    K4. Vide un resursi:              {d['k4_vide']}%
+    K5. Vadība un kvalitātes sistēma: {d['k5_vadiba']}%
 
 ────────────────────────────────────────────────────────
 PRIORITĀRIE PRIEKŠLIKUMI
@@ -784,9 +885,15 @@ PRIORITĀRIE PRIEKŠLIKUMI
 PAR RĪKU
 ────────────────────────────────────────────────────────
 Pašnovērtēšana balstīta uz maģistra darba ietvaros izstrādāto
-modeli: Geide I. (2026). Kvalitātes novērtējums un
+divlīmeņu modeli, kurā starpdisciplinaritāte tiek skatīta kā
+izglītības kvalitātes elements (mācību kvalitātes dimensija,
+K1–K3), bet tās efektīva īstenošana prasa integrētas sistēmas
+atbalstu vadības procesu līmenī (integrētās sistēmas dimensija,
+K4–K5).
+
+Avots: Geide I. (2026). Kvalitātes novērtējums un
 starpdisciplinaritāte vispārējās vidējās izglītības
-iestādēs. RTU IEVF.
+iestādēs. Maģistra darbs. RTU IEVF.
 """
 
     st.download_button(
@@ -809,4 +916,3 @@ st.markdown(
     "Geide I. (2026). Kvalitātes novērtējums un starpdisciplinaritāte "
     "vispārējās vidējās izglītības iestādēs. RTU IEVF. "
     "Darba vadītāja: prof. Inga Lapiņa.*"
-)
